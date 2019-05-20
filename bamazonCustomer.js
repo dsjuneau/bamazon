@@ -4,6 +4,7 @@
 
 //Variable declarations
 var mysql = require("mysql");
+var inquirer = require("inquirer");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -29,8 +30,9 @@ function displayProducts() {
   connection.query("SELECT * FROM products", function(err, res) {
     if (err) throw err;
 
-    console.log("=======================================================\n");
-    console.log("ID\tProduct\t\tPrice\tQuantity\n");
+    console.log("=======================================================");
+    console.log("ID\tProduct\t\tPrice\tQuantity");
+    console.log("=======================================================");
     res.forEach(element => {
       //Trick to format so that columns come out properly aligned
       let extraTab = element.product_name.length < 8 ? "\t\t" : "\t";
@@ -41,8 +43,27 @@ function displayProducts() {
       );
     });
     connection.end();
+    promptUser();
   });
 }
 
+function promptUser() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "id",
+        message: "Enter the ID of the product you want to buy:"
+      },
+      {
+        type: "input",
+        name: "quantity",
+        message: "How many would you like to purchase?"
+      }
+    ])
+    .then(function(answer) {
+      console.log(answer);
+    });
+}
 //Main program
 connectAndAct(connection, displayProducts);
