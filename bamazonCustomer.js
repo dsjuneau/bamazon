@@ -5,20 +5,20 @@
 //Variable declarations
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-
-//Function declarations
-var connection = mysql.createConnection({
+let connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
   password: "password",
   database: "bamazon"
 });
+//Function declarations
+
 // This function connects to the database and runs whatever action function was passed to it
-function connectAndAct(action) {
+function connectAndAct(action, id, quantity) {
   connection.connect(function(err) {
-    if (err) throw err;
-    action();
+    // if (err) throw err;
+    action(id, quantity);
   });
 }
 
@@ -44,8 +44,8 @@ function displayProducts() {
   });
 }
 
-function updateStock() {
-  console.log("getting to this point");
+function updateStock(id, quantity) {
+  console.log(id, quantity);
 }
 
 function promptUser(stock) {
@@ -70,7 +70,7 @@ function promptUser(stock) {
         answer.quantity <= stock[answer.id - 1].stock_quantity
       ) {
         console.log("Your order is on the way!!");
-        connectAndAct(updateStock);
+        connectAndAct(updateStock, answer.id, answer.quantity);
       } else {
         console.log(
           "We don't have that item or enough of that item.  Please try again."
