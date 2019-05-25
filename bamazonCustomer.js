@@ -14,14 +14,6 @@ let connection = mysql.createConnection({
 });
 //Function declarations
 
-// This function connects to the database and runs whatever action function was passed to it
-function connectAndAct(action, id, quantity) {
-  connection.connect(function(err) {
-    // if (err) throw err;
-    action(id, quantity);
-  });
-}
-
 // These are the action functions
 function displayProducts() {
   console.log("Selecting all products...\n");
@@ -39,13 +31,21 @@ function displayProducts() {
         }\t${element.stock_quantity}`
       );
     });
-    connection.end();
     promptUser(res);
   });
 }
 
 function updateStock(id, quantity) {
   console.log(id, quantity);
+  connection.query(
+    "UPDATE products SET stock_quantity = ? WHERE item_id=?",
+    [quantity, id],
+    function(err) {
+      if (err) throw err;
+
+      displayProducts();
+    }
+  );
 }
 
 function promptUser(stock) {
@@ -69,8 +69,16 @@ function promptUser(stock) {
         answer.quantity >= 1 &&
         answer.quantity <= stock[answer.id - 1].stock_quantity
       ) {
-        console.log("Your order is on the way!!");
-        connectAndAct(updateStock, answer.id, answer.quantity);
+        console.log(`Your order is on the way!!`);
+        console.log(
+          `The total costs is ${parseFloat(answer.quantity) *
+            parseFloat(stock[answer.id - 1].price)}.`
+        );
+        updateStock(
+          parseInt(answer.id),
+          parseInt(stock[answer.id - 1].stock_quantity) -
+            parseInt(answer.quantity)
+        );
       } else {
         console.log(
           "We don't have that item or enough of that item.  Please try again."
@@ -81,4 +89,7 @@ function promptUser(stock) {
 }
 
 //Main program
-connectAndAct(displayProducts);
+connection.connect(function(err) {
+  if (err) throw err;
+  displayProducts();
+});
