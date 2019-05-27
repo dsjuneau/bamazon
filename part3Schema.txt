@@ -17,8 +17,5 @@ INSERT INTO departments (department_id, department_name, overheadcosts)
 VALUES (4, "electronics", 10000);
 INSERT INTO departments (department_id, department_name, overheadcosts)
 VALUES (5, "food", 1200);
-INSERT INTO departments (department_id, department_name, overheadcosts)
-VALUES (6, "music", 10000);
-
 
 

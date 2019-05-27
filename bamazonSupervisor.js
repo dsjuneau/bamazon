@@ -17,12 +17,12 @@ let connection = mysql.createConnection({
 // These are the action functions
 function listSales() {
   let query =
-    "SELECT department_id, departments.department_name, overheadcosts, sum(productsales) as productsales, sum(productsales)-overheadcosts as totalprofit FROM departments JOIN products ON departments.department_name = products.department_name GROUP BY departments.department_name";
+    "SELECT department_id, departments.department_name, overheadcosts, sum(productsales) as productsales, sum(productsales)-overheadcosts as totalprofit FROM departments LEFT JOIN products ON departments.department_name = products.department_name GROUP BY departments.department_name";
 
   console.log("Selecting all sales...\n");
   connection.query(query, function(err, res) {
     if (err) throw err;
-    console.log(res);
+
     console.log(
       "==================================================================================================================="
     );
@@ -45,75 +45,25 @@ function listSales() {
   });
 }
 
-function updateStock(id, quantity) {
-  console.log(id, quantity);
+function addDepartment(id, dept, overhead) {
   connection.query(
-    "SELECT stock_quantity FROM products WHERE item_id = ?",
-    [id],
-    function(err, res) {
-      if (err) throw err;
-      console.log(res);
-      quantity = quantity + res[0].stock_quantity;
-      connection.query(
-        "UPDATE products SET stock_quantity = ? WHERE item_id=?",
-        [quantity, id],
-        function(err) {
-          if (err) throw err;
-
-          listProducts();
-        }
-      );
-    }
-  );
-}
-
-function addStock(name, dept, price, amount) {
-  connection.query(
-    "INSERT INTO products (product_name, department_name, price, stock_quantity) values(?, ?, ?, ?)",
-    [name, dept, price, amount],
+    "INSERT INTO departments (department_id, department_name, overheadcosts) values(?, ?, ?)",
+    [id, dept, overhead],
     function(err) {
       if (err) throw err;
 
-      listProducts();
+      listSales();
     }
   );
 }
 
-function addMenu() {
+function addDepartmentMenu() {
   inquirer
     .prompt([
       {
         type: "input",
-        name: "id",
-        message: "Increase the inventory of which item?  Enter id:"
-      },
-      {
-        type: "input",
-        name: "quantity",
-        message:
-          "How many items are being added to the inventory? Enter amount:"
-      }
-    ])
-    .then(function(answer) {
-      if (answer.id >= 1 && answer.id <= 10) {
-        console.log(
-          `You are adding ${answer.quantity} items to id number ${answer.id}.`
-        );
-        updateStock(parseInt(answer.id), parseInt(answer.quantity));
-      } else {
-        console.log("That id is invalid.  Please try again.");
-        addMenu();
-      }
-    });
-}
-
-function addItemMenu() {
-  inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "name",
-        message: "What is the product's name?"
+        name: "department_id",
+        message: "What is the department ID?"
       },
       {
         type: "input",
@@ -122,21 +72,15 @@ function addItemMenu() {
       },
       {
         type: "input",
-        name: "price",
-        message: "What is the price per product?"
-      },
-      {
-        type: "input",
-        name: "quantity",
-        message: "How many items are being initially added to the inventory?"
+        name: "overhead",
+        message: "What is the overhead of the department?"
       }
     ])
     .then(function(answer) {
-      addStock(
-        answer.name,
+      addDepartment(
+        answer.department_id,
         answer.department_name,
-        parseFloat(answer.price),
-        parseInt(answer.quantity)
+        answer.overhead
       );
     });
 }
@@ -156,7 +100,7 @@ function superMenu() {
           listSales();
           break;
         case "Create new department":
-          listProducts(true);
+          addDepartmentMenu();
           break;
       }
     });
