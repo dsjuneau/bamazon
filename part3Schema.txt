@@ -1,0 +1,24 @@
+
+
+CREATE TABLE departments (
+  department_id INT,
+  department_name VARCHAR(255) NULL,
+  overheadcosts DECIMAL(10,2) NULL,
+  PRIMARY KEY (department_id)
+);
+
+INSERT INTO departments (department_id, department_name, overheadcosts)
+VALUES (1, "music", 1000);
+INSERT INTO departments (department_id, department_name, overheadcosts)
+VALUES (2, "clothing", 2000);
+INSERT INTO departments (department_id, department_name, overheadcosts)
+VALUES (3, "office supplies", 2500);
+INSERT INTO departments (department_id, department_name, overheadcosts)
+VALUES (4, "electronics", 10000);
+INSERT INTO departments (department_id, department_name, overheadcosts)
+VALUES (5, "food", 1200);
+INSERT INTO departments (department_id, department_name, overheadcosts)
+VALUES (6, "music", 10000);
+
+
+

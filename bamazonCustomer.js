@@ -35,11 +35,11 @@ function displayProducts() {
   });
 }
 
-function updateStock(id, quantity) {
+function updateStock(id, quantity, sales) {
   console.log(id, quantity);
   connection.query(
-    "UPDATE products SET stock_quantity = ? WHERE item_id=?",
-    [quantity, id],
+    "UPDATE products SET stock_quantity = ?, productsales = ? WHERE item_id=?",
+    [quantity, sales, id],
     function(err) {
       if (err) throw err;
 
@@ -69,15 +69,17 @@ function promptUser(stock) {
         answer.quantity >= 1 &&
         answer.quantity <= stock[answer.id - 1].stock_quantity
       ) {
+        let amount =
+          parseFloat(answer.quantity) * parseFloat(stock[answer.id - 1].price);
+        let newProductSales = stock[answer.id - 1].productsales + amount;
         console.log(`Your order is on the way!!`);
-        console.log(
-          `The total costs is ${parseFloat(answer.quantity) *
-            parseFloat(stock[answer.id - 1].price)}.`
-        );
+        console.log(`The total costs is ${amount}.`);
+
         updateStock(
           parseInt(answer.id),
           parseInt(stock[answer.id - 1].stock_quantity) -
-            parseInt(answer.quantity)
+            parseInt(answer.quantity),
+          newProductSales
         );
       } else {
         console.log(
